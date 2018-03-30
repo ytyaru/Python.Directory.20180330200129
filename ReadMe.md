@@ -12,7 +12,11 @@ os, os.path, pathlib, shutil, などを駆使せねばできないことが多�
 
 # 参考
 
-https://msdn.microsoft.com/ja-jp/library/system.io.directory(v=vs.110).aspx
+* https://msdn.microsoft.com/ja-jp/library/system.io.directory(v=vs.110).aspx
+* https://docs.python.jp/3/library/shutil.html
+* https://docs.python.jp/3/library/os.html
+* https://docs.python.jp/3/library/os.path.html
+* https://docs.python.jp/3/library/pathlib.html
 
 # 開発環境
 
