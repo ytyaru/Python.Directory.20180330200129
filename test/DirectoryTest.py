@@ -8,8 +8,111 @@ class DirectoryTest(unittest.TestCase):
     # ----------------------------
     # クラスメソッド
     # ----------------------------
-    def test_ChangeExtension(self):
-        self.assertEqual('/tmp/a.csv', Path.ChangeExtension('/tmp/a.txt', 'csv'))
+    def test_IsExist(self):
+        self.assertTrue(Directory.IsExist(os.getcwd()))
+        self.assertTrue(not Directory.IsExist('/NotExistDir'))
+
+    def test_Create_Delete(self):
+        target = '/tmp/work/__TEST__'
+        self.assertTrue(not Directory.IsExist(target))
+        Directory.Create(target)
+        self.assertTrue(Directory.IsExist(target))
+        Directory.Delete(target)
+        self.assertTrue(not Directory.IsExist(target))
+        target = '/tmp/work/__TEST__/A/B/C'
+        self.assertTrue(not Directory.IsExist(target))
+        Directory.Create(target)
+        self.assertTrue(Directory.IsExist(target))
+        Directory.Delete(target)
+        self.assertTrue(not Directory.IsExist(target))
+        target = '/tmp/work/__TEST__'
+        Directory.Delete(target)
+
+    def test_Copy_single(self):
+        target = '/tmp/work/__TEST__'
+        self.assertTrue(not Directory.IsExist(target))
+        Directory.Create(target)
+        Directory.Copy(target, '/tmp/work/__TEST_2__')
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST_2__'))
+        Directory.Delete(target)
+        Directory.Delete('/tmp/work/__TEST_2__')
+
+    def test_Copy_tree(self):
+        target = '/tmp/work/__TEST__'
+        self.assertTrue(not Directory.IsExist(target))
+        Directory.Create(target)
+        Directory.Create(os.path.join(target, 'A'))
+        pathlib.Path(os.path.join(target, 'A/a.txt')).touch()
+        self.assertTrue(not Directory.IsExist('/tmp/work/__TEST_2__'))
+        Directory.Copy(target, '/tmp/work/__TEST_2__')
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST_2__'))
+        self.assertTrue(os.path.isfile('/tmp/work/__TEST_2__/A/a.txt'))
+        Directory.Delete(target)
+        Directory.Delete('/tmp/work/__TEST_2__')
+    
+    def test_Move_single(self):
+        target = '/tmp/work/__TEST__'
+        self.assertTrue(not Directory.IsExist(target))
+        self.assertTrue(not Directory.IsExist('/tmp/work/__TEST_2__'))
+        Directory.Create(target)
+        Directory.Move(target, '/tmp/work/__TEST_2__')
+        self.assertTrue(not Directory.IsExist(target))
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST_2__'))
+        Directory.Delete('/tmp/work/__TEST_2__')
+
+    def test_Move_tree(self):
+        target = '/tmp/work/__TEST__'
+        self.assertTrue(not Directory.IsExist(target))
+        self.assertTrue(not Directory.IsExist('/tmp/work/__TEST_2__'))
+        Directory.Create(target)
+        Directory.Create(os.path.join(target, 'A'))
+        pathlib.Path(os.path.join(target, 'A/a.txt')).touch()
+        
+        Directory.Move(target, '/tmp/work/__TEST_2__')
+        self.assertTrue(not Directory.IsExist(target))
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST_2__'))
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST_2__/A'))
+        self.assertTrue(os.path.isfile('/tmp/work/__TEST_2__/A/a.txt'))
+        Directory.Delete('/tmp/work/__TEST_2__')
+
+    def test_Archive(self):
+         self.__make_archive()
+         os.remove('/tmp/work/__TEST__' + '.zip')
+
+    def __make_archive(self):
+        target = '/tmp/work/__TEST__'
+        self.assertTrue(not Directory.IsExist(target))
+        Directory.Create(target)
+        Directory.Create(os.path.join(target, 'A'))
+        pathlib.Path(os.path.join(target, 'A/a.txt')).touch()
+        
+        Directory.Archive(target, target + '.zip')
+        self.assertTrue(os.path.isfile(target + '.zip'))
+        Directory.Delete(target)
+
+    def test_UnArchive(self):
+        self.__make_archive()
+        self.assertTrue(not Directory.IsExist('/tmp/work/__TEST__'))
+        Directory.UnArchive('/tmp/work/__TEST__.zip')
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST__'))
+        self.assertTrue(Directory.IsExist('/tmp/work/__TEST__/A'))
+        self.assertTrue(os.path.isfile('/tmp/work/__TEST__/A/a.txt'))
+        Directory.Delete('/tmp/work/__TEST__')
+        os.remove('/tmp/work/__TEST__.zip')
+
+    """
+    """
+
+
+
+
+
+
+
+
+
+
+    """
     def test_ChangeExtension_MultiDot(self):
         self.assertEqual('/tmp/a.txt.csv', Path.ChangeExtension('/tmp/a.txt.abc', 'csv'))
 
@@ -357,7 +460,7 @@ class DirectoryTest(unittest.TestCase):
         self.assertEqual('/tmp', str(p.Parent.Parent.Parent))
         self.assertEqual('/', str(p.Parent.Parent.Parent.Parent))
         self.assertEqual('/', str(p.Parent.Parent.Parent.Parent.Parent))
-
+    """
 
 if __name__ == '__main__':
     unittest.main()

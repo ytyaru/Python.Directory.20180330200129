@@ -4,38 +4,23 @@ class Directory:
     @classmethod
     def IsExist(cls, path): return os.path.isdir(path)
     @classmethod
-    def Create(cls, path):
-        os.makedirs(path, exist_ok=True)
-        #os.makedirs(path, exist_ok=True)
-        # なぜか末尾の空ディレクトリが作成されない
-        # なのに2回目のos.mkdirではFileExistsErrorが出る
-        # try-except文にすると作成されない
-        # エラーなく末尾の空ディレクトリを作成する方法がない
-        #os.mkdir(path)
-        #try: os.mkdir(path)
-        #except: pass
-    #def Create(cls, path): pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+    def Create(cls, path): os.makedirs(path, exist_ok=True)
     @classmethod
     def Copy(cls, src, dst): return shutil.copytree(src, dst)
     @classmethod
     def Delete(cls, path): shutil.rmtree(path)
     @classmethod
     def Move(cls, src, dst): return shutil.move(src, dst)
-
-    #@classmethod
-    #def GetSize(cls, path): return shutil.disk_usage(path)
-
-    #@classmethod
-    #def Which(cls, command): return shutil.which(command)
-
     @classmethod
     def Archive(cls, src, dst):
         ext = os.path.splitext(dst)[1][1:]
         archive_exts = [f[0] for f in shutil.get_archive_formats()]
         if ext not in archive_exts : raise Exception('拡張子\'{}\'は不正値です。アーカイブ拡張子は次のいずれかのみ可能です。{}'.format(ext, archive_exts))
-        return shutil.make_archive(pathlib.Path(dst).stem, ext, root_dir=src, base_dir=src)
-        #return shutil.make_archive(os.path.basename(dst), ext, root_dir=src, base_dir=src)
-        #return shutil.make_archive(os.path.dirname(dst), ext, root_dir=src, base_dir=src)
+        head, tail = os.path.split(src)
+        base_name = os.path.join(os.path.dirname(dst), tail)
+        root_dir = os.path.join(os.path.dirname(dst), head)
+        base_dir = tail
+        return shutil.make_archive(base_name, ext, root_dir=root_dir, base_dir=base_dir)
 
     @classmethod
     def UnArchive(cls, src, dst=None):

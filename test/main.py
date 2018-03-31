@@ -25,12 +25,12 @@ if __name__ == '__main__':
         assert(False ==  Directory.IsExist(target2))
         Directory.Copy(target_root, target2)
         assert(True ==  Directory.IsExist(target2))
-        #assert(True ==  Directory.IsExist(os.path.join(target2, 'SUB1', 'SUB11', 'SUB111')))
         assert(True == Directory.IsExist(os.path.join(target2, 'SUB1', 'SUB11')))
         a = Directory.Archive(target_root, target_root + '.zip')
-        #a = Directory.Archive(target_root, os.path.basename(target_root) + '.zip')
         print(a)
-        assert(True == Directory.IsExist(str(pathlib.Path(target_root).parent) + '.zip'))
+        print(target_root + '.zip')
+        assert(a == target_root + '.zip')
+        assert(os.path.isfile(a))
     finally:
-        #Directory.Delete(target_root)
-        pass
+        Directory.Delete(target_root)
+        os.remove(target_root + '.zip')
